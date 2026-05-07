@@ -83,4 +83,64 @@ open -na "/Applications/\(version).app" --args -no-remote -P "\(profile)"
             .appendingPathComponent("Desktop")
         Self.buildAppBundle(version: version, profile: profile, in: desktop)
     }
+
+    // MARK: - Init and loading
+
+    init() { load() }
+
+    func load() {
+        versions = Self.loadVersions()
+        profiles = Self.loadProfiles()
+    }
+
+    func reloadProfiles() {
+        profiles = Self.loadProfiles()
+    }
+
+    nonisolated static func loadVersions() -> [String] {
+        guard let enumerator = FileManager.default.enumerator(atPath: applicationsPath) else {
+            return []
+        }
+        var result: [String] = []
+        while let name = enumerator.nextObject() as? String {
+            let lower = name.lowercased()
+            if isFirefoxApp(name) {
+                result.append(String((name as NSString).lastPathComponent.dropLast(4)))
+                enumerator.skipDescendants()
+            } else if !(lower.hasPrefix("firefox") || lower.hasPrefix("minefield")) {
+                enumerator.skipDescendants()
+            }
+        }
+        return result.sorted { $0.localizedCaseInsensitiveCompare($1) == .orderedAscending }
+    }
+
+    nonisolated static func loadProfiles() -> [String] {
+        guard let content = try? String(contentsOfFile: profilesIniPath, encoding: .utf8) else {
+            return []
+        }
+        return parseProfiles(from: content)
+    }
+
+    // MARK: - Launching
+
+    func launch(version: String, profile: String) {
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+        p.arguments = [
+            "-na", "\(Self.applicationsPath)/\(version).app",
+            "--args", "-no-remote", "-P", profile
+        ]
+        try? p.run()
+        NSApplication.shared.terminate(nil)
+    }
+
+    func openProfileManager(version: String) {
+        let p = Process()
+        p.executableURL = URL(fileURLWithPath: "/usr/bin/open")
+        p.arguments = [
+            "-n", "\(Self.applicationsPath)/\(version).app",
+            "--args", "--profilemanager"
+        ]
+        try? p.run()
+    }
 }
