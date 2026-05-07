@@ -20,6 +20,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>2.5.0</string>
+	<key>NSQuitAlwaysKeepsWindows</key>
+	<false/>
 	<key>SUFeedURL</key>
 	<string>https://s3.amazonaws.com/mff_sparkle/MultiFirefoxAppcast2.xml</string>
 </dict>
