@@ -4,18 +4,7 @@ import XCTest
 final class FirefoxManagerTests: XCTestCase {
 
     func testParseProfilesExtractsNames() {
-        let ini = """
-        [Install]
-        Default=Profiles/xyz.default
-        [Profile0]
-        Name=default
-        IsRelative=1
-        Path=Profiles/xyz.default
-        [Profile1]
-        Name=Work
-        IsRelative=1
-        Path=Profiles/abc.work
-        """
+        let ini = "[Install]\nDefault=Profiles/xyz.default\n[Profile0]\nName=default\nIsRelative=1\nPath=Profiles/xyz.default\n[Profile1]\nName=Work\nIsRelative=1\nPath=Profiles/abc.work"
         XCTAssertEqual(FirefoxManager.parseProfiles(from: ini), ["default", "Work"])
     }
 
