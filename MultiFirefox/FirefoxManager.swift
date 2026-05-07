@@ -72,11 +72,10 @@ open -na "/Applications/\(version).app" --args -no-remote -P "\(profile)"
 """
         try? plist.write(to: infoPlist, atomically: true, encoding: .utf8)
 
-        let chmod = Process()
-        chmod.executableURL = URL(fileURLWithPath: "/bin/chmod")
-        chmod.arguments = ["+x", launcher.path]
-        try? chmod.run()
-        chmod.waitUntilExit()
+        try? FileManager.default.setAttributes(
+            [.posixPermissions: 0o755],
+            ofItemAtPath: launcher.path
+        )
     }
 
     func createApplication(version: String, profile: String) {
